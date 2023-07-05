@@ -1,7 +1,12 @@
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
+
+from fastapi import HTTPException, status, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 from sqlalchemy import Table, create_engine, MetaData, Column, Text
 from sqlalchemy.schema import DropTable
+
+from typing_extensions import Annotated
 
 # fasapi_sqlalchemy is no longer supported/deprectaed, sowe can
 #directly use DBSession
@@ -17,12 +22,17 @@ from models import Products, Users
 
 from passlib.context import CryptContext
 
+
 import config
 
 DBSession = scoped_session(sessionmaker())
 engine = None
 
+#creating a context in which context we are going to decrypt the password
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+#defining a scheme for oauth2 so it can be applied to an auth-verification function
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="signin")
 
 SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
@@ -98,7 +108,8 @@ def login_user(user_cred):
 
 # if we can ghet the user for that token it mena sthat this token is valid
 #async def get_current_user(token: str): (later)
-def get_current_user(token: str):
+### old: def get_current_user(token: str):
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -117,5 +128,9 @@ def get_current_user(token: str):
     return user
 
 
-    
+# def get_current_active_user(current_user: Users = get_current_user):
+def get_current_active_user(current_user: Annotated[Users, Depends(get_current_user)]):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
 

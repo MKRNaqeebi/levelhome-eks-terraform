@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Header,Depends
+from typing_extensions import Annotated
 import uvicorn
 
 from dotenv import load_dotenv
 load_dotenv()
 
-from db import list_products, insert_new_product, delete_product, insert_new_user, login_user, get_current_user
+from db import list_products, insert_new_product, delete_product, insert_new_user, login_user, get_current_user, get_current_active_user
 
 from models import Products, Users
 
@@ -43,15 +44,21 @@ def get_func():
 
 #will convert auth funciton into decorator later
 @app.get('/products')
-def get_products(access_token: str=Header(None)):
-    print(f"val of access token=|{access_token}|")
-    if(access_token):
-        current_user=get_current_user(access_token)
-        if(current_user and current_user.user_password):
-            my_prods = list_products()
-            return my_prods
-        else: return []    
-    else: return []
+#def get_products(access_token: str=Header(None)):
+def get_products(current_user: Annotated[UsersInput, Depends(get_current_active_user)]):
+    print(f"val of access token=|{current_user.user_email}|")
+#    print(f"val of access token=|{access_token}|")
+#    if(access_token):
+#        current_user=get_current_user(access_token)
+#        if(current_user and current_user.user_password):
+#            my_prods = list_products()
+#            return my_prods
+#        else: return []    
+#    else: return []
+    if(current_user and current_user.user_password):
+        my_prods = list_products()
+        return my_prods
+    else: return []    
 
 
 @app.post('/products',status_code=201)
@@ -92,7 +99,8 @@ def user_signup(input: UsersInput):
 
 
 @app.post('/signin',status_code=200,response_model=LoginOutput) #2000 be=casue we are not creating/inserting anything
-def user_signin(input: UsersInput):
+#def user_signin(input: UsersInput):
+def user_signin(input: Annotated[OAuth2PasswordRequestForm, Depends()]):    
     try:
         #convert our requets object into a model object which is a SQl-Alcehmy object
         new_user = Users(user_email=input.user_email, user_password=input.user_password)
