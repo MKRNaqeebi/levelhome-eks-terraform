@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Header
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from sqlalchemy import Table, create_engine, MetaData, Column, Text
@@ -108,8 +108,8 @@ def login_user(user_cred):
 
 # if we can ghet the user for that token it mena sthat this token is valid
 #async def get_current_user(token: str): (later)
-### old: def get_current_user(token: str):
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+## requires Python 3.9.6 | def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+def get_current_user(token: str):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -128,9 +128,17 @@ def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return user
 
 
+# The usee of Annoated can speed execution, but requries Python 3.9.6 minimum
+#
 # def get_current_active_user(current_user: Users = get_current_user):
-def get_current_active_user(current_user: Annotated[Users, Depends(get_current_user)]):
-    if current_user.disabled:
+#def get_current_active_user(current_user: Annotated[Users, Depends(get_current_user)]):
+#    if current_user.disabled:
+#        raise HTTPException(status_code=400, detail="Inactive user")
+#    return current_user
+
+# def get_current_active_user(current_user: Users = get_current_user):
+def get_current_active_user(access_token: str=Header(None)):
+    current_user = get_current_user(access_token)
+    if not current_user.user_password:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
-

@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Header,Depends
-from typing_extensions import Annotated
+#reqiuires Python 3.9.6 from typing_extensions import Annotated 
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 import uvicorn
 
 from dotenv import load_dotenv
@@ -45,7 +47,9 @@ def get_func():
 #will convert auth funciton into decorator later
 @app.get('/products')
 #def get_products(access_token: str=Header(None)):
-def get_products(current_user: Annotated[UsersInput, Depends(get_current_active_user)]):
+# requires Python 3.9.6 def get_products(current_user: Annotated[UsersInput, Depends(get_current_active_user)]):
+
+def get_products(current_user: UsersInput = Depends(get_current_active_user)):    
     print(f"val of access token=|{current_user.user_email}|")
 #    print(f"val of access token=|{access_token}|")
 #    if(access_token):
@@ -99,8 +103,8 @@ def user_signup(input: UsersInput):
 
 
 @app.post('/signin',status_code=200,response_model=LoginOutput) #2000 be=casue we are not creating/inserting anything
-#def user_signin(input: UsersInput):
-def user_signin(input: Annotated[OAuth2PasswordRequestForm, Depends()]):    
+## requires Python 3.9.6 def user_signin(input: Annotated[OAuth2PasswordRequestForm, Depends()]):    
+def user_signin(input: UsersInput):
     try:
         #convert our requets object into a model object which is a SQl-Alcehmy object
         new_user = Users(user_email=input.user_email, user_password=input.user_password)
