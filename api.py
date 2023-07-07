@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Header,Depends
+from fastapi import FastAPI, Header,Depends, Request
 #reqiuires Python 3.9.6 from typing_extensions import Annotated 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
@@ -38,6 +38,30 @@ class LoginOutput(BaseModel):
     token_type: str="Bearer"
     message: str
 
+#def auth_required_old(func):
+#    def wrapper(request: Request, *args, **kwargs):
+#        # do something with request object
+#        #current_user: UsersInput = Depends(get_current_user)
+#        current_user: UsersInput = get_current_user(request.headers.get('access_token'))
+#        if(current_user and current_user.user_password):
+#            return func(*args, **kwargs)
+#        else:
+#            return ["login required"]    
+#    return wrapper
+
+from functools import wraps
+
+def auth_required(func):
+    @wraps(func)
+    # we need async
+    async def wrapper(request: Request, *args, **kwargs):
+        # do something with request object
+        #current_user: UsersInput = get_current_user(request.headers.get('access_token'))
+        #if(current_user and current_user.user_password)::we
+        return await func(*args, **kwargs)
+    return wrapper
+
+
 
 
 @app.get('/')
@@ -45,12 +69,15 @@ def get_func():
     return {'text': 'hello world'}, 200
 
 #will convert auth funciton into decorator later
+
 @app.get('/products')
 #def get_products(access_token: str=Header(None)):
 # requires Python 3.9.6 def get_products(current_user: Annotated[UsersInput, Depends(get_current_active_user)]):
 
-def get_products(current_user: UsersInput = Depends(get_current_active_user)):    
-    print(f"val of access token=|{current_user.user_email}|")
+#def get_products(current_user: UsersInput = Depends(get_current_active_user)):    
+@auth_required
+def get_products():    
+    #print(f"val of access token=|{current_user.user_email}|")
 #    print(f"val of access token=|{access_token}|")
 #    if(access_token):
 #        current_user=get_current_user(access_token)
@@ -59,10 +86,12 @@ def get_products(current_user: UsersInput = Depends(get_current_active_user)):
 #            return my_prods
 #        else: return []    
 #    else: return []
-    if(current_user and current_user.user_password):
-        my_prods = list_products()
-        return my_prods
-    else: return []    
+    #if(current_user and current_user.user_password):
+    #    my_prods = list_products()
+    #    return my_prods
+    #else: return []    
+    my_prods = list_products()
+    return my_prods
 
 
 @app.post('/products',status_code=201)
