@@ -2,6 +2,8 @@ from fastapi import FastAPI, Header,Depends, Request
 #reqiuires Python 3.9.6 from typing_extensions import Annotated 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+from functools import wraps
+
 import uvicorn
 
 from dotenv import load_dotenv
@@ -38,27 +40,15 @@ class LoginOutput(BaseModel):
     token_type: str="Bearer"
     message: str
 
-#def auth_required_old(func):
-#    def wrapper(request: Request, *args, **kwargs):
-#        # do something with request object
-#        #current_user: UsersInput = Depends(get_current_user)
-#        current_user: UsersInput = get_current_user(request.headers.get('access_token'))
-#        if(current_user and current_user.user_password):
-#            return func(*args, **kwargs)
-#        else:
-#            return ["login required"]    
-#    return wrapper
-
-from functools import wraps
 
 def auth_required(func):
     @wraps(func)
-    # we need async
-    async def wrapper(request: Request, *args, **kwargs):
-        # do something with request object
-        #current_user: UsersInput = get_current_user(request.headers.get('access_token'))
-        #if(current_user and current_user.user_password)::we
-        return await func(*args, **kwargs)
+    # we need the wraps so we can accesss the parameters provided in the "router"
+    def wrapper(request: Request, *args, **kwargs):
+        #print(f"val of access token=|{request.headers.get('access-token')}|")
+        current_user: UsersInput = get_current_user(request.headers.get('access-token'))
+        if(current_user and current_user.user_password):
+            return func(request=request, *args, **kwargs)
     return wrapper
 
 
@@ -76,7 +66,8 @@ def get_func():
 
 #def get_products(current_user: UsersInput = Depends(get_current_active_user)):    
 @auth_required
-def get_products():    
+#def get_products():    
+def get_products(request: Request):    
     #print(f"val of access token=|{current_user.user_email}|")
 #    print(f"val of access token=|{access_token}|")
 #    if(access_token):
@@ -95,7 +86,8 @@ def get_products():
 
 
 @app.post('/products',status_code=201)
-def create_products(input: ProductsInput):
+@auth_required
+def create_products(request: Request, input: ProductsInput):
     try:
         #convert our requets object into a model object which is a SQl-Alcehmy object
         new_product = Products(product_id=input.product_id, product_name=input.product_name, product_price=input.product_price, product_description=input.product_description)
@@ -107,7 +99,8 @@ def create_products(input: ProductsInput):
 
 
 @app.delete('/products/{product_id}',status_code=202)
-def delete_products(product_id: str):
+@auth_required
+def delete_products(request: Request, product_id: str):
     try:
         result = delete_product(product_id)
         if(result): return "product deleted successfully"
