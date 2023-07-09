@@ -6,7 +6,6 @@ click==8.0.4
 contextlib2==21.6.0
 contextvars==2.4
 cryptography==40.0.2
-dataclasses==0.8
 ecdsa==0.18.0
 fastapi==0.83.0
 greenlet==2.0.2
