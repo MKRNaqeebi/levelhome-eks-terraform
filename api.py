@@ -109,6 +109,9 @@ def delete_products(request: Request, product_id: str):
         return "something went wrong,connection of server error ", 500
 
 
+#---------------------------------
+#THIS IS FOR UPWORK PROJECT : 
+#Python Developer Needed to Build Authentication Service using FastAPI and PostgreSQL 
 
 @app.post('/signup',status_code=201)
 def user_signup(input: UsersInput):
@@ -118,13 +121,12 @@ def user_signup(input: UsersInput):
 
         insert_new_user([new_user])
         return "User registered/inserted successfully"
-    except e:
+    except Exception as e:    
         return f"User failed to be registered/insertedi and error = |{e}|"
     ############ COMING, we will do the sending of the email soon    
 
 
-
-@app.post('/signin',status_code=200,response_model=LoginOutput) #2000 be=casue we are not creating/inserting anything
+@app.post('/signin',status_code=200,response_model=LoginOutput) #2000 because we are not creating/inserting anything
 ## requires Python 3.9.6 def user_signin(input: Annotated[OAuth2PasswordRequestForm, Depends()]):    
 def user_signin(input: UsersInput):
     try:
@@ -135,7 +137,7 @@ def user_signin(input: UsersInput):
         if(access_token): 
             return {'access_token':access_token,'message':"User Logged in successfully"}
         else: return {'access_token':"",'message':"User Credentials provided do not match"}
-    except e:
+    except Exception as e:    
         return {'access_token':"",'message':f"User failed to be logged-in and error = |{e}|"}
 
 

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: levelhome-fastapi
+spec:
+  selector:
+    matchLabels:
+      name: levelhome-fastapi
+  template:
+    metadata:
+      labels:
+        name: levelhome-fastapi
+    spec:
+      containers:
+        - name: fastapi-levelhome-app
+          image: 417722183802.dkr.ecr.us-west-2.amazonaws.com/levelhome:latest
+          ports:
+            - containerPort: 8000
