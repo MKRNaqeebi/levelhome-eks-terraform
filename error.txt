@@ -1,0 +1,69 @@
+
+│ Error: creating CloudWatch Logs Log Group (/aws/eks/test-three-terraform-eks/cluster): ResourceAlreadyExistsException: The specified log group already exists
+│ 
+│   with module.eks.aws_cloudwatch_log_group.this[0],
+│   on .terraform/modules/eks/main.tf line 80, in resource "aws_cloudwatch_log_group" "this":
+│   80: resource "aws_cloudwatch_log_group" "this" {
+│ 
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["engress_allow_access_all_outbound"],
+│   on .terraform/modules/eks/node_groups.tf line 182, in resource "aws_security_group_rule" "node":
+│  182:   cidr_blocks      = try(each.value.cidr_blocks, null)
+│ 
+│ "cidr_blocks": conflicts with source_security_group_id
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["ingress_allow_access_all_inbound"],
+│   on .terraform/modules/eks/node_groups.tf line 182, in resource "aws_security_group_rule" "node":
+│  182:   cidr_blocks      = try(each.value.cidr_blocks, null)
+│ 
+│ "cidr_blocks": conflicts with source_security_group_id
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["engress_allow_access_all_outbound"],
+│   on .terraform/modules/eks/node_groups.tf line 183, in resource "aws_security_group_rule" "node":
+│  183:   ipv6_cidr_blocks = try(each.value.ipv6_cidr_blocks, null)
+│ 
+│ "ipv6_cidr_blocks": conflicts with source_security_group_id
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["ingress_allow_access_all_inbound"],
+│   on .terraform/modules/eks/node_groups.tf line 183, in resource "aws_security_group_rule" "node":
+│  183:   ipv6_cidr_blocks = try(each.value.ipv6_cidr_blocks, null)
+│ 
+│ "ipv6_cidr_blocks": conflicts with source_security_group_id
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["engress_allow_access_all_outbound"],
+│   on .terraform/modules/eks/node_groups.tf line 186, in resource "aws_security_group_rule" "node":
+│  186:   source_security_group_id = try(
+│  187:     each.value.source_security_group_id,
+│  188:     try(each.value.source_cluster_security_group, false) ? local.cluster_security_group_id : null
+│  189:   )
+│ 
+│ "source_security_group_id": conflicts with cidr_blocks
+╵
+╷
+│ Error: Conflicting configuration arguments
+│ 
+│   with module.eks.aws_security_group_rule.node["ingress_allow_access_all_inbound"],
+│   on .terraform/modules/eks/node_groups.tf line 186, in resource "aws_security_group_rule" "node":
+│  186:   source_security_group_id = try(
+│  187:     each.value.source_security_group_id,
+│  188:     try(each.value.source_cluster_security_group, false) ? local.cluster_security_group_id : null
+│  189:   )
+│ 
+│ "source_security_group_id": conflicts with cidr_blocks
+╵
+muhammadkamran@Muhammads-MacBook-Pro cluster % 

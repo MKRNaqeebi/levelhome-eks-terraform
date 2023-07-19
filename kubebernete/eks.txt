@@ -1,0 +1,16 @@
+okay you are aws expert and you are writing document which will be used to create eks from cli using cloudformation template, You have done this before. you have 10 years of experience. This will used by someone who does not have experience...
+
+
+aws s3 mb s3://your-bucket-name
+
+aws s3 cp your-template-file.yaml s3://your-bucket-name/
+
+aws cloudformation create-stack --stack-name your-stack-name --template-url https://s3.amazonaws.com/your-bucket-name/your-template-file.yaml --capabilities CAPABILITY_IAM
+
+aws cloudformation describe-stacks --stack-name your-stack-name
+
+aws eks update-kubeconfig --name your-cluster-name
+
+kubectl get nodes
+
+kubectl get svc 
