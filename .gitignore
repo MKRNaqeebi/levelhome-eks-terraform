@@ -4,3 +4,5 @@ __pycache__/
 venv/
 levelhomechart/
 terraform_eks/
+cluster/*
+!cluster/levelhome.tf
