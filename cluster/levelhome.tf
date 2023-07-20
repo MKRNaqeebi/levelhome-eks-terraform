@@ -77,28 +77,27 @@ module "eks" {
       instance_type = "t3.medium"
     }
   }
+
   node_security_group_additional_rules = {
-    ingress_allow_access_all_inbound = {
-      type                          = "ingress"
-      protocol                      = "tcp"
-      from_port                     = 0
-      to_port                       = 0
-      cidr_blocks                   = ["0.0.0.0/0"]
-      ipv6_cidr_blocks              = ["::/0"]
-      description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
     }
-    engress_allow_access_all_outbound = {
-      type                          = "egress"
-      protocol                      = "tcp"
-      from_port                     = 0
-      to_port                       = 0
-      cidr_blocks                   = ["0.0.0.0/0"]
-      ipv6_cidr_blocks              = ["::/0"]
-      description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+    egress_all = {
+      description      = "Node all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      type             = "egress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
     }
   }
 }
-
 resource "aws_iam_policy" "worker_policy" {
   name        = "worker-policy"
   description = "Worker policy for the ALB Ingress"

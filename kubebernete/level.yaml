@@ -27,3 +27,7 @@ spec:
               value: postgres12345!
             - name: POSTGRES_DB
               value: levelhome1
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 0.0.0.0/0
